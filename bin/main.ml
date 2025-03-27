@@ -1,26 +1,44 @@
 type resource =
-  | Wool
-  | Lumber
+  | Sheep
+  | Wood
   | Ore
   | Brick
-  | Grain
+  | Wheat
+  | Desert
 
 let print_tile (x, y) =
   match x with
-  | Wool -> " Wool " ^ string_of_int y ^ " "
-  | Lumber -> "Lumber " ^ string_of_int y
+  | Sheep -> "Sheep " ^ string_of_int y ^ " "
+  | Wood -> " Wood " ^ string_of_int y ^ " "
   | Ore -> "  Ore " ^ string_of_int y ^ " "
-  | Brick -> " Brick " ^ string_of_int y
-  | Grain -> " Grain " ^ string_of_int y
+  | Brick -> "Brick " ^ string_of_int y ^ " "
+  | Wheat -> "Wheat " ^ string_of_int y ^ " "
+  | Desert -> " Desert "
+
+let create_board () =
+  (* Create the board with resources in a fixed pattern *)
+  let resources = [|
+    Sheep; Wood; Brick;
+    Wheat; Sheep; Ore; Wood;
+    Brick; Desert; Wheat; Wheat;
+    Wood; Sheep; Ore; Brick;
+    Ore; Sheep; Wood; Wheat
+  |] in
+  
+  (* Create number tokens in a fixed pattern *)
+  let numbers = [|
+    5; 2; 6;
+    8; 10; 9; 12;
+    3; 0; 11; 4;
+    8; 4; 9; 5;
+    10; 11; 3; 6
+  |] in
+  
+  (* Create the board with resource/number pairs *)
+  Array.init 19 (fun i -> (resources.(i), numbers.(i)))
 
 let () =
-  let board = Array.make 18 (Wool, 7) in
-  board.(2) <- (Lumber, 2);
-  board.(5) <- (Ore, 4);
-  board.(8) <- (Brick, 1);
-  board.(11) <- (Grain, 6);
-  board.(16) <- (Wool, 10);
-  board.(17) <- (Wool, 10);
+  let board = create_board () in
 
   print_endline
     ("\n\
@@ -57,36 +75,38 @@ let () =
       \  /         \\         /         \\         /         \\\n\
       \ / "
     ^ print_tile board.(8)
-    ^ "  \\_______/ " ^ " Desert " ^ "  \\_______/ "
+    ^ "  \\_______/ "
     ^ print_tile board.(9)
+    ^ "  \\_______/ "
+    ^ print_tile board.(10)
     ^ "  \\\n\
       \ \\           /       \\           /       \\           /\n\
       \  \\         /         \\         /         \\         /\n\
       \   \\_______/ "
-    ^ print_tile board.(10)
-    ^ "  \\_______/ "
     ^ print_tile board.(11)
+    ^ "  \\_______/ "
+    ^ print_tile board.(12)
     ^ "  \\_______/\n\
       \   /       \\           /       \\           /       \\\n\
       \  /         \\         /         \\         /         \\\n\
       \ / "
-    ^ print_tile board.(12)
-    ^ "  \\_______/ "
     ^ print_tile board.(13)
     ^ "  \\_______/ "
     ^ print_tile board.(14)
+    ^ "  \\_______/ "
+    ^ print_tile board.(15)
     ^ "  \\\n\
       \ \\           /       \\           /       \\           /\n\
       \  \\         /         \\         /         \\         /\n\
       \   \\_______/ "
-    ^ print_tile board.(15)
-    ^ "  \\_______/ "
     ^ print_tile board.(16)
+    ^ "  \\_______/ "
+    ^ print_tile board.(17)
     ^ "  \\_______/\n\
       \           \\           /       \\           /\n\
       \            \\         /         \\         /\n\
       \             \\_______/ "
-    ^ print_tile board.(17)
+    ^ print_tile board.(18)
     ^ "  \\_______/ \n\
       \                     \\           /\n\
       \                      \\         /\n\
