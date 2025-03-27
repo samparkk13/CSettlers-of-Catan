@@ -20,6 +20,7 @@ let () =
   board.(8) <- (Brick, 1);
   board.(11) <- (Grain, 6);
   board.(16) <- (Wool, 10);
+  board.(17) <- (Wool, 10);
 
   print_endline
     ("\n\
