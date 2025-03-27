@@ -14,7 +14,7 @@ let print_tile (x, y) =
   | Grain -> " Grain " ^ string_of_int y
 
 let () =
-  let board = Array.make 19 (Wool, 7) in
+  let board = Array.make 18 (Wool, 7) in
   board.(2) <- (Lumber, 2);
   board.(5) <- (Ore, 4);
   board.(8) <- (Brick, 1);
@@ -56,38 +56,36 @@ let () =
       \  /         \\         /         \\         /         \\\n\
       \ / "
     ^ print_tile board.(8)
-    ^ "  \\_______/ "
+    ^ "  \\_______/ " ^ " Desert " ^ "  \\_______/ "
     ^ print_tile board.(9)
-    ^ "  \\_______/ "
-    ^ print_tile board.(10)
     ^ "  \\\n\
       \ \\           /       \\           /       \\           /\n\
       \  \\         /         \\         /         \\         /\n\
       \   \\_______/ "
-    ^ print_tile board.(11)
+    ^ print_tile board.(10)
     ^ "  \\_______/ "
-    ^ print_tile board.(12)
+    ^ print_tile board.(11)
     ^ "  \\_______/\n\
       \   /       \\           /       \\           /       \\\n\
       \  /         \\         /         \\         /         \\\n\
       \ / "
+    ^ print_tile board.(12)
+    ^ "  \\_______/ "
     ^ print_tile board.(13)
     ^ "  \\_______/ "
     ^ print_tile board.(14)
-    ^ "  \\_______/ "
-    ^ print_tile board.(15)
     ^ "  \\\n\
       \ \\           /       \\           /       \\           /\n\
       \  \\         /         \\         /         \\         /\n\
       \   \\_______/ "
-    ^ print_tile board.(16)
+    ^ print_tile board.(15)
     ^ "  \\_______/ "
-    ^ print_tile board.(17)
+    ^ print_tile board.(16)
     ^ "  \\_______/\n\
       \           \\           /       \\           /\n\
       \            \\         /         \\         /\n\
       \             \\_______/ "
-    ^ print_tile board.(18)
+    ^ print_tile board.(17)
     ^ "  \\_______/ \n\
       \                     \\           /\n\
       \                      \\         /\n\
