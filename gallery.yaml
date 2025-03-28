@@ -1,0 +1,28 @@
+---
+# Members of your group.
+group:  
+  - name: Caleb Kim
+    netid: ck586
+  - name: Noah Lee
+    netid: njl56
+  - name: Samuel Park
+    netid: sp994
+
+# Your PM.
+pm:
+  name: Johnson Wang
+  netid: jw2693
+# Set to false if you don't want your gallery entry to be public.
+publish: true
+# Pithy title
+title: "CSettlers of Catan"
+# OK if this is a Cornell Github link, but public gallery viewers won't be able to see it.
+git-repo: https://github.coecis.cornell.edu/ck586/3110_final_project
+# Replace the URL with your own demo video.
+demo-video-url: "[Your YouTube Demo URL]"
+# Write a short, attention-grabbing description of your project.
+desc: >
+  Our project is a Settlers of Catan board generator that creates a virtual game board 
+  with the proper distribution of resources and number tokens. The generator creates a 
+  hexagonal game board with 19 tiles representing the 5 different resources (Sheep, 
+  Wood, Ore, Brick, and Wheat) and the Desert.
