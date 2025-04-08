@@ -1,5 +1,5 @@
 type resource =
-  | Sheep
+  | Sheep 
   | Wood
   | Ore
   | Brick
