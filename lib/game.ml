@@ -64,3 +64,23 @@ let rec game_loop () =
         print_endline "Goodbye!\n"
   end
   else print_endline "\nThank you for playing Settlers of Catan!"
+
+(* logic for rolling dice *)
+let () = Random.self_init ()
+let roll_x x = 1 + Random.int x
+
+let add_resource resource player =
+  match resource with
+  | Board.Sheep -> Player.increment_resource "sheep" player
+  | Board.Wood -> Player.increment_resource "wood" player
+  | Board.Ore -> Player.increment_resource "ore" player
+  | Board.Brick -> Player.increment_resource "brick" player
+  | Board.Wheat -> Player.increment_resource "wheat" player
+  | Board.Desert -> ()
+
+let roll_dice board players =
+  let res = roll_x 6 + roll_x 6 in
+  Array.iter
+    (fun (a, b) ->
+      if b = res then List.iter (fun x -> add_resource a x) players)
+    board

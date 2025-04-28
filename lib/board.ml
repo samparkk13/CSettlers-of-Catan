@@ -8,16 +8,23 @@ type resource =
   | Wheat
   | Desert
 
-type tile = resource * int
+type player = Player.p
+
+type tile = {
+  resource : resource;
+  num : int;
+  mutable player : player list;
+}
+
 type board = tile array
 
-let print_tile (x, y) =
-  match x with
-  | Sheep -> "Sheep " ^ string_of_int y ^ " "
-  | Wood -> " Wood " ^ string_of_int y ^ " "
-  | Ore -> "  Ore " ^ string_of_int y ^ " "
-  | Brick -> "Brick " ^ string_of_int y ^ " "
-  | Wheat -> "Wheat " ^ string_of_int y ^ " "
+let print_tile x =
+  match x.resource with
+  | Sheep -> "Sheep " ^ string_of_int x.num ^ " "
+  | Wood -> " Wood " ^ string_of_int x.num ^ " "
+  | Ore -> "  Ore " ^ string_of_int x.num ^ " "
+  | Brick -> "Brick " ^ string_of_int x.num ^ " "
+  | Wheat -> "Wheat " ^ string_of_int x.num ^ " "
   | Desert -> " Desert "
 
 let create () =
@@ -51,8 +58,9 @@ let create () =
     [| 5; 2; 6; 8; 10; 9; 12; 3; 0; 11; 4; 8; 4; 9; 5; 10; 11; 3; 6 |]
   in
 
-  (* Create the board with resource/number pairs *)
-  Array.init 19 (fun i -> (resources.(i), numbers.(i)))
+  (* Create the board with resource/number thruple *)
+  Array.init 19 (fun i ->
+      { resource = resources.(i); num = numbers.(i); player = [] })
 
 let print board =
   print_endline "============================================";

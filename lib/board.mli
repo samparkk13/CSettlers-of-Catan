@@ -10,7 +10,13 @@ type resource =
   | Wheat
   | Desert
 
-type tile = resource * int
+type player = Player.p
+
+type tile = {
+  resource : resource;
+  num : int;
+  mutable player : player list;
+}
 (** [tile] represents a single hexagonal tile on the board with a resource and
     number. *)
 

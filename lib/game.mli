@@ -16,3 +16,5 @@ val main_menu : unit -> bool
 val game_loop : unit -> unit
 (** [game_loop ()] runs the main game loop, handling menus and board display.
     This is the main entry point for running the game. *)
+
+val roll_dice : (Board.resource * int) array -> Player.p list -> unit
