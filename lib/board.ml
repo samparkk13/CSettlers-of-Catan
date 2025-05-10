@@ -150,18 +150,15 @@ let distribute_resources board tile_indices player =
       add_resource tile.resource player)
     tile_indices
 
-let add_player_to_place board player place =
+let place_village board player place bool =
   let adjacent_tiles = get_adjacent_tiles place in
 
   List.iter
     (fun tile_index ->
       board.(tile_index).player <- player :: board.(tile_index).player)
-    adjacent_tiles
-
-let place_village board player place_num =
-  places.(place_num) <- "v";
-  let adjacent_tiles = get_adjacent_tiles place_num in
-  distribute_resources board adjacent_tiles player
+    adjacent_tiles;
+  places.(place) <- "v";
+  if bool then distribute_resources board adjacent_tiles player
 
 let print board =
   print_endline "============================================";

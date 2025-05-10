@@ -18,20 +18,34 @@ let initialize_game board =
         ^ string_of_int (i + 1)
         ^ ", choose where to place your village:");
       let place = read_int () in
-      Board.add_player_to_place board player place;
+      Board.place_village board player place false;
       print_endline ("Village placed at " ^ string_of_int place ^ ".");
-      Board.place_village board player place;
       Board.print board;
       print_endline
         ("Resources from adjacent tiles distributed to Player "
         ^ string_of_int (i + 1)
         ^ "."))
     players;
+  List.iteri
+    (fun i player ->
+      print_endline
+        ("Player "
+        ^ string_of_int (4 - i)
+        ^ ", choose where to place your village:");
+      let place = read_int () in
+      Board.place_village board player place true;
+      print_endline ("Village placed at " ^ string_of_int place ^ ".");
+      Board.print board;
+      print_endline
+        ("Resources from adjacent tiles distributed to Player "
+        ^ string_of_int (i + 1)
+        ^ "."))
+    (List.rev players);
   print_endline "All players have placed their initial villages."
 
 let roll_dice board =
-  let res = roll_x 6 + roll_x 6 in
-  (* let res = 6 in *)
+  (* let res = roll_x 6 + roll_x 6 in *)
+  let res = 6 in
   Printf.printf "Rolled: %d\n" res;
 
   Array.iter

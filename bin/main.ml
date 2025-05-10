@@ -55,6 +55,7 @@ let rec game_loop () =
     let board = Board.create () in
     Board.print board;
     Game.initialize_game board;
+    Game.roll_dice board;
     print_endline "\nWhat would you like to do next?";
     print_endline "1. Play again";
     print_endline "2. Quit";
