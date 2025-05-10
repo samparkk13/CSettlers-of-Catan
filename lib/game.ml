@@ -65,6 +65,9 @@ let rec game_loop () =
   end
   else print_endline "\nThank you for playing Settlers of Catan!"
 
+let players =
+  [ Player.create (); Player.create (); Player.create (); Player.create () ]
+
 (* logic for rolling dice *)
 let () = Random.self_init ()
 let roll_x x = 1 + Random.int x

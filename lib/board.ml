@@ -19,12 +19,14 @@ type tile = {
 type board = tile array
 
 let print_tile x =
+  let num_str = string_of_int x.num in
+  let padding = if x.num >= 10 then "" else " " in
   match x.resource with
-  | Sheep -> "Sheep " ^ string_of_int x.num ^ " "
-  | Wood -> " Wood " ^ string_of_int x.num ^ " "
-  | Ore -> "  Ore " ^ string_of_int x.num ^ " "
-  | Brick -> "Brick " ^ string_of_int x.num ^ " "
-  | Wheat -> "Wheat " ^ string_of_int x.num ^ " "
+  | Sheep -> "Sheep " ^ padding ^ num_str
+  | Wood -> " Wood " ^ padding ^ num_str
+  | Ore -> "  Ore " ^ padding ^ num_str
+  | Brick -> "Brick " ^ padding ^ num_str
+  | Wheat -> "Wheat " ^ padding ^ num_str
   | Desert -> " Desert "
 
 let create () =
@@ -67,73 +69,73 @@ let print board =
   print_endline "Here is your generated Catan board:";
   print_endline
     ("\n\
-     \                        _______\n\
-     \                       /       \\\n\
-     \                      /         \\\n\
-     \              _______/ "
+     \                         A______A\n\
+     \                        /       \\\n\
+     \                       /         \\\n\
+     \              A______A/ "
     ^ print_tile board.(0)
-    ^ "  \\_______\n\
-      \             /       \\           /       \\\n\
-      \            /         \\         /         \\\n\
-      \    _______/ "
+    ^ "  \\A______A\n\
+      \              /       \\           /       \\\n\
+      \             /         \\         /         \\\n\
+      \    A______A/ "
     ^ print_tile board.(1)
-    ^ "  \\_______/ "
+    ^ "  \\A_____A/ "
     ^ print_tile board.(2)
-    ^ "  \\_______\n\
-      \   /       \\           /       \\           /       \\\n\
-      \  /         \\         /         \\         /         \\\n\
-      \ / "
+    ^ "  \\A______A\n\
+      \    /       \\           /       \\           /       \\\n\
+      \   /         \\         /         \\         /         \\\n\
+      \ A/ "
     ^ print_tile board.(3)
-    ^ "  \\_______/ "
+    ^ "  \\A_____A/ "
     ^ print_tile board.(4)
-    ^ "  \\_______/ "
+    ^ "  \\A_____A/ "
     ^ print_tile board.(5)
-    ^ "  \\\n\
-      \ \\           /       \\           /       \\           /\n\
-      \  \\         /         \\         /         \\         /\n\
-      \   \\_______/ "
+    ^ "  \\A\n\
+      \  \\           /       \\           /       \\           /\n\
+      \   \\         /         \\         /         \\         /\n\
+      \    A______A/ "
     ^ print_tile board.(6)
-    ^ "  \\_______/ "
+    ^ "  \\A_____A/ "
     ^ print_tile board.(7)
-    ^ "  \\_______/\n\
-      \   /       \\           /       \\           /       \\\n\
-      \  /         \\         /         \\         /         \\\n\
-      \ / "
+    ^ "  \\A______A\n\
+      \    /       \\           /       \\           /       \\\n\
+      \   /         \\         /         \\         /         \\\n\
+      \ A/ "
     ^ print_tile board.(8)
-    ^ "  \\_______/ "
+    ^ "  \\A_____A/ "
     ^ print_tile board.(9)
-    ^ "  \\_______/ "
+    ^ "  \\A_____A/ "
     ^ print_tile board.(10)
-    ^ "  \\\n\
-      \ \\           /       \\           /       \\           /\n\
-      \  \\         /         \\         /         \\         /\n\
-      \   \\_______/ "
+    ^ "  \\A\n\
+      \  \\           /       \\           /       \\           /\n\
+      \   \\         /         \\         /         \\         /\n\
+      \    A______A/ "
     ^ print_tile board.(11)
-    ^ "  \\_______/ "
+    ^ "  \\A_____A/ "
     ^ print_tile board.(12)
-    ^ "  \\_______/\n\
-      \   /       \\           /       \\           /       \\\n\
-      \  /         \\         /         \\         /         \\\n\
-      \ / "
+    ^ "  \\A______A\n\
+      \    /       \\           /       \\           /       \\\n\
+      \   /         \\         /         \\         /         \\\n\
+      \ A/ "
     ^ print_tile board.(13)
-    ^ "  \\_______/ "
+    ^ "  \\A_____A/ "
     ^ print_tile board.(14)
-    ^ "  \\_______/ "
+    ^ "  \\A_____A/ "
     ^ print_tile board.(15)
-    ^ "  \\\n\
-      \ \\           /       \\           /       \\           /\n\
-      \  \\         /         \\         /         \\         /\n\
-      \   \\_______/ "
+    ^ "  \\A\n\
+      \  \\           /       \\           /       \\           /\n\
+      \   \\         /         \\         /         \\         /\n\
+      \    A______A/ "
     ^ print_tile board.(16)
-    ^ "  \\_______/ "
+    ^ "  \\A_____A/ "
     ^ print_tile board.(17)
-    ^ "  \\_______/\n\
-      \           \\           /       \\           /\n\
-      \            \\         /         \\         /\n\
-      \             \\_______/ "
+    ^ "  \\A______A\n\
+      \            \\           /       \\           /\n\
+      \             \\         /         \\         /\n\
+      \              A______A/ "
     ^ print_tile board.(18)
-    ^ "  \\_______/ \n\
-      \                     \\           /\n\
-      \                      \\         /\n\
-      \                       \\_______/\n\n\
+    ^ "  \\A______A\n\
+      \                      \\           /\n\
+      \                       \\         /\n\
+      \                        A_______A\n\n\
       \ \n")
