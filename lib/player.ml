@@ -27,3 +27,10 @@ let amt_resource resource player =
   | "brick" -> player.brick
   | "wheat" -> player.wheat
   | _ -> 0
+
+let print_hand player =
+  Printf.printf "Sheep: %d\n" player.sheep;
+  Printf.printf "Wood: %d\n" player.wood;
+  Printf.printf "Ore: %d\n" player.ore;
+  Printf.printf "Brick: %d\n" player.brick;
+  Printf.printf "Wheat: %d\n" player.wheat

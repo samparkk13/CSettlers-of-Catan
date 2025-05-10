@@ -36,3 +36,8 @@ val print_tile : tile -> string
 val print : board -> unit
 (** [print board] prints a visual representation of the board to the console.
     @param board The board to print *)
+
+val add_player_to_place : tile array -> player -> int -> unit
+val distribute_resources : tile array -> int list -> player -> unit
+val place_village : tile array -> player -> int -> unit
+val add_resource : resource -> player -> unit
