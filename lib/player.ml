@@ -34,3 +34,37 @@ let print_hand player =
   Printf.printf "Ore: %d\n" player.ore;
   Printf.printf "Brick: %d\n" player.brick;
   Printf.printf "Wheat: %d\n" player.wheat
+
+let remove_resource res_type player amount =
+  match res_type with
+  | "wood" ->
+      if player.wood >= amount then begin
+        player.wood <- player.wood - amount;
+        true
+      end
+      else false
+  | "sheep" ->
+      if player.sheep >= amount then begin
+        player.sheep <- player.sheep - amount;
+        true
+      end
+      else false
+  | "ore" ->
+      if player.ore >= amount then begin
+        player.ore <- player.ore - amount;
+        true
+      end
+      else false
+  | "brick" ->
+      if player.brick >= amount then begin
+        player.brick <- player.brick - amount;
+        true
+      end
+      else false
+  | "wheat" ->
+      if player.wheat >= amount then begin
+        player.wheat <- player.wheat - amount;
+        true
+      end
+      else false
+  | _ -> false

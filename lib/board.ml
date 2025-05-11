@@ -126,21 +126,11 @@ let places = Array.make 54 "A"
 
 let add_resource resource player =
   match resource with
-  | Sheep ->
-      Player.increment_resource "sheep" player;
-      Player.print_hand player
-  | Wood ->
-      Player.increment_resource "wood" player;
-      Player.print_hand player
-  | Ore ->
-      Player.increment_resource "ore" player;
-      Player.print_hand player
-  | Brick ->
-      Player.increment_resource "brick" player;
-      Player.print_hand player
-  | Wheat ->
-      Player.increment_resource "wheat" player;
-      Player.print_hand player
+  | Sheep -> Player.increment_resource "sheep" player
+  | Wood -> Player.increment_resource "wood" player
+  | Ore -> Player.increment_resource "ore" player
+  | Brick -> Player.increment_resource "brick" player
+  | Wheat -> Player.increment_resource "wheat" player
   | Desert -> ()
 
 let distribute_resources board tile_indices player =

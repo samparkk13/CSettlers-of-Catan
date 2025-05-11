@@ -1,3 +1,5 @@
+type player = Player.p
+
 let players =
   [ Player.create (); Player.create (); Player.create (); Player.create () ]
 
