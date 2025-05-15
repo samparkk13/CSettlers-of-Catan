@@ -51,7 +51,11 @@ let initialize_game board players =
         print_endline
           ("Resources from adjacent tiles distributed to Player "
           ^ string_of_int (player_idx + 1)
-          ^ ".")
+          ^ ".");
+      print_endline "Enter where you want to place your road: (0-71)";
+      let v = read_int () in
+      Board.place_road player_idx v board players;
+      Board.print board
     end
     else begin
       print_endline

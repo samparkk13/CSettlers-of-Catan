@@ -310,15 +310,8 @@ let place_settlement board player place i bool =
   end
   else false
 
-let road_colors = Array.make 72 (Foreground ANSITerminal.Default)
-
-let find_player_index player =
-  List.find_index (fun x -> x = player) (Game.players ())
-
-let place_road player place =
-  match find_player_index player with
-  | None -> failwith "Not a valid player."
-  | Some x -> road_colors.(place) <- color_of_player x
+let place_road player_idx place board players =
+  (roads board).(place) <- color_of_player player_idx
 
 let print board =
   print_endline "============================================";

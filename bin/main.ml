@@ -60,7 +60,7 @@ let display_player_resources player =
 (** [build_road_action player] handles the road building action for a player.
     Checks if the player has enough resources, deducts them if successful, and
     provides feedback. *)
-let build_road_action player =
+let build_road_action player board players player_idx =
   if
     Player.amt_resource "brick" player < 1
     || Player.amt_resource "wood" player < 1
@@ -79,7 +79,7 @@ let build_road_action player =
     let _ = Player.remove_resource "wood" player 1 in
 
     (* Build the road *)
-    let _ = Board.place_road player (int_of_string i) in
+    let _ = Board.place_road player_idx (int_of_string i) board players in
     print_endline "\nRoad built successfully!";
     display_player_resources player;
     true
@@ -237,7 +237,7 @@ let player_turn board player_idx players =
 
     match read_line () with
     | "1" ->
-        let _ = build_road_action player in
+        let _ = build_road_action player board players player_idx in
         action_phase ()
     | "2" ->
         let _ = build_settlement_action board player player_idx in

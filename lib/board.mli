@@ -74,7 +74,7 @@ val place_settlement : board -> player -> int -> int -> bool -> bool
     for the player at the given place. If initial is true, it also distributes
     initial resources. *)
 
-val place_road : player -> int -> unit
+val place_road : int -> int -> board -> player list -> unit
 (** [place_road player place] places a road for the player at the given place.
 *)
 
