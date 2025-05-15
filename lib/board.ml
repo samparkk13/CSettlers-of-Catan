@@ -34,40 +34,67 @@ let print_tile x =
   | Wheat -> "Wheat " ^ padding ^ num_str
   | Desert -> " Desert "
 
+let shuffle_array arr =
+  let n = Array.length arr in
+  for i = n - 1 downto 1 do
+    let j = Random.int (i + 1) in
+    let temp = arr.(i) in
+    arr.(i) <- arr.(j);
+    arr.(j) <- temp
+  done
+
 let create () =
-  (* Create the board with resources in a fixed pattern *)
+  Random.self_init ();
   let resources =
     [|
-      Sheep;
       Wood;
-      Brick;
+      Wood;
+      Wood;
+      Wood;
+      Wheat;
+      Wheat;
+      Wheat;
       Wheat;
       Sheep;
-      Ore;
-      Wood;
+      Sheep;
+      Sheep;
+      Sheep;
       Brick;
+      Brick;
+      Brick;
+      Ore;
+      Ore;
+      Ore;
       Desert;
-      Wheat;
-      Wheat;
-      Wood;
-      Sheep;
-      Ore;
-      Brick;
-      Ore;
-      Sheep;
-      Wood;
-      Wheat;
     |]
   in
 
-  (* Create number tokens in a fixed pattern *)
   let numbers =
-    [| 5; 2; 6; 8; 10; 9; 12; 3; 0; 11; 4; 8; 4; 9; 5; 10; 11; 3; 6 |]
+    [| 2; 12; 3; 3; 4; 4; 5; 5; 6; 6; 8; 8; 9; 9; 10; 10; 11; 11 |]
   in
 
-  (* Create the board with resource/number thruple *)
-  ( Array.init 19 (fun i ->
-        { resource = resources.(i); num = numbers.(i); player = [] }),
+  shuffle_array resources;
+  shuffle_array numbers;
+
+  let desert_index =
+    match Array.find_index (fun x -> x = Desert) resources with
+    | Some idx -> idx
+    | None -> failwith "Desert not found"
+  in
+
+  let board = Array.make 19 { resource = Desert; num = 0; player = [] } in
+
+  board.(desert_index) <- { resource = Desert; num = 0; player = [] };
+
+  let num_idx = ref 0 in
+  for i = 0 to 18 do
+    if i <> desert_index then (
+      board.(i) <-
+        { resource = resources.(i); num = numbers.(!num_idx); player = [] };
+      incr num_idx)
+  done;
+
+  ( board,
     Array.make 54 ("o", ANSITerminal.default),
     Array.make 72 ANSITerminal.default )
 
