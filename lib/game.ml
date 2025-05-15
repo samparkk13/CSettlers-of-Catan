@@ -1,6 +1,6 @@
 type player = Player.p
 
-let players =
+let players () =
   [ Player.create (); Player.create (); Player.create (); Player.create () ]
 
 (* logic for rolling dice *)
@@ -12,25 +12,30 @@ let initialize_game () =
       print_endline ("Player " ^ string_of_int (i + 1));
       print_endline "Choose where to place settlement:")
 
-let initialize_game (board : Board.board) =
+let initialize_game (board : Board.board) players =
   let rec place_settlement player i reverse =
     let player_num = if reverse then 4 - i else i + 1 in
     print_endline
       ("Player " ^ string_of_int player_num
      ^ ", choose a settlement location (0-53):");
-    let place = read_int () in
-    if place < 0 || place > 53 then (
-      print_endline "Invalid location. Please choose a number between 0 and 53.";
-      place_settlement player i reverse)
-    else (
-      Board.place_settlement board player place
-        (if reverse then 3 - i else i)
-        reverse;
-      print_endline ("Settlement placed at " ^ string_of_int place ^ ".");
-      Board.print board;
-      print_endline
-        ("Resources from adjacent tiles distributed to Player "
-       ^ string_of_int player_num ^ "."))
+    try
+      let place = read_int () in
+      if place < 0 || place > 53 then (
+        print_endline
+          "Invalid location. Please choose a number between 0 and 53.";
+        place_settlement player i reverse)
+      else (
+        Board.place_settlement board player place
+          (if reverse then 3 - i else i)
+          reverse;
+        print_endline ("Settlement placed at " ^ string_of_int place ^ ".");
+        Board.print board;
+        print_endline
+          ("Resources from adjacent tiles distributed to Player "
+         ^ string_of_int player_num ^ "."))
+    with Failure _ ->
+      print_endline "Invalid input. Please enter a valid integer.";
+      place_settlement player i reverse
   in
   List.iteri (fun i player -> place_settlement player i false) players;
   List.iteri (fun i player -> place_settlement player i true) (List.rev players);

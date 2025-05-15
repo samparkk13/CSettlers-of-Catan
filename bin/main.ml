@@ -132,8 +132,8 @@ let color_of_player int =
   | _ -> ""
 
 (** [player_turn board player_idx] handles the turn for a specific player. *)
-let player_turn board player_idx =
-  let player = List.nth Game.players player_idx in
+let player_turn board player_idx players =
+  let player = List.nth players player_idx in
 
   print_endline
     ("\n\n=== PLAYER "
@@ -174,27 +174,27 @@ let player_turn board player_idx =
 
   action_phase ()
 
-let game_round board num_players current_round =
+let game_round board num_players current_round players =
   print_endline ("\n\n====== ROUND " ^ string_of_int current_round ^ " ======");
 
-  let rec process_player_turns player_idx =
+  let rec process_player_turns player_idx players =
     if player_idx < num_players then begin
-      player_turn board player_idx;
-      process_player_turns (player_idx + 1)
+      player_turn board player_idx players;
+      process_player_turns (player_idx + 1) players
     end
   in
 
-  process_player_turns 0
+  process_player_turns 0 players
 
 (** [play_game board] runs the main game loop with multiple rounds. *)
-let play_game board =
-  let num_players = List.length Game.players in
+let play_game board players =
+  let num_players = List.length players in
 
   print_endline "\nPlacing initial settlements...";
-  Game.initialize_game board;
+  Game.initialize_game board players;
 
   let rec game_rounds round =
-    game_round board num_players round;
+    game_round board num_players round players;
 
     print_endline "\nContinue to the next round? (y/n): ";
     match read_line () with
@@ -210,8 +210,9 @@ let rec game_loop () =
   if main_menu () then begin
     print_endline "";
     let board = Board.create () in
+    let players = Game.players () in
     Board.print board;
-    play_game board;
+    play_game board players;
 
     print_endline "\nWhat would you like to do next?";
     print_endline "1. Play again";

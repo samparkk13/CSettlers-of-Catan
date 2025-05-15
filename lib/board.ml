@@ -68,7 +68,7 @@ let create () =
   (* Create the board with resource/number thruple *)
   ( Array.init 19 (fun i ->
         { resource = resources.(i); num = numbers.(i); player = [] }),
-    Array.make 54 ("A", ANSITerminal.default),
+    Array.make 54 ("o", ANSITerminal.default),
     Array.make 72 ANSITerminal.default )
 
 let get_adjacent_tiles place =
