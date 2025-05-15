@@ -155,19 +155,19 @@ let print_tile_tests =
   [
     ( "print_tile formats Sheep correctly" >:: fun _ ->
       let result = Board.print_tile {resource = Board.Sheep; num = 5; player = []} in
-      assert_equal "Sheep 5 " result ~printer:(fun s -> s) );
+      assert_equal "Sheep  5" result ~printer:(fun s -> s) );
     ( "print_tile formats Wood correctly" >:: fun _ ->
       let result = Board.print_tile {resource = Board.Wood; num = 3; player = []} in
-      assert_equal " Wood 3 " result ~printer:(fun s -> s) );
+      assert_equal " Wood  3" result ~printer:(fun s -> s) );
     ( "print_tile formats Ore correctly" >:: fun _ ->
       let result = Board.print_tile {resource = Board.Ore; num = 8; player = []} in
-      assert_equal "  Ore 8 " result ~printer:(fun s -> s) );
+      assert_equal "  Ore  8" result ~printer:(fun s -> s) );
     ( "print_tile formats Brick correctly" >:: fun _ ->
       let result = Board.print_tile {resource = Board.Brick; num = 4; player = []} in
-      assert_equal "Brick 4 " result ~printer:(fun s -> s) );
+      assert_equal "Brick  4" result ~printer:(fun s -> s) );
     ( "print_tile formats Wheat correctly" >:: fun _ ->
       let result = Board.print_tile {resource = Board.Wheat; num = 10; player = []} in
-      assert_equal "Wheat 10 " result ~printer:(fun s -> s) );
+      assert_equal "Wheat 10" result ~printer:(fun s -> s) );
     ( "print_tile formats Desert correctly" >:: fun _ ->
       let result = Board.print_tile {resource = Board.Desert; num = 7; player = []} in
       assert_equal " Desert " result ~printer:(fun s -> s) );

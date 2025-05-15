@@ -123,12 +123,22 @@ let trade_with_bank player =
     end
   end
 
+let color_of_player int =
+  match int with
+  | 0 -> "RED"
+  | 1 -> "BLUE"
+  | 2 -> "YELLOW"
+  | 3 -> "GREEN"
+  | _ -> ""
+
 (** [player_turn board player_idx] handles the turn for a specific player. *)
 let player_turn board player_idx =
   let player = List.nth Game.players player_idx in
 
   print_endline
-    ("\n\n=== PLAYER " ^ string_of_int (player_idx + 1) ^ "'S TURN ===");
+    ("\n\n=== PLAYER "
+    ^ string_of_int (player_idx + 1)
+    ^ "'S TURN ===" ^ "(" ^ color_of_player player_idx ^ ")");
   display_player_resources player;
 
   print_endline "\nRolling dice...";

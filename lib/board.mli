@@ -38,5 +38,5 @@ val print : board -> unit
     @param board The board to print *)
 
 val distribute_resources : tile array -> int list -> player -> unit
-val place_village : tile array -> player -> int -> bool -> unit
+val place_settlement : tile array -> player -> int -> int -> bool -> unit
 val add_resource : resource -> player -> unit
