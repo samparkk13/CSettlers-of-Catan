@@ -52,7 +52,24 @@ val distribute_resources : board -> int list -> player -> unit
 (** [distribute_resources board tile_indices player] distributes resources to
     the player based on the given tile indices that represent adjacent tiles. *)
 
-val place_settlement : board -> player -> int -> int -> bool -> unit
+val get_adjacent_vertices : int -> int list
+(** [get_adjacent_vertices vertex] returns a list of vertices that are directly
+    connected to the given vertex by a single road. *)
+
+val is_vertex_occupied : board -> int -> bool
+(** [is_vertex_occupied board vertex] checks if a given vertex already has a
+    settlement. *)
+
+val has_adjacent_settlement : board -> int -> bool
+(** [has_adjacent_settlement board vertex] checks if any vertex adjacent to the
+    given vertex has a settlement or city. *)
+
+val can_place_settlement : board -> int -> bool
+(** [can_place_settlement board vertex] checks if a settlement can be placed at
+    the given vertex according to game rules: 1. The vertex must be empty 2. No
+    adjacent vertex can have a settlement (2-road distance rule) *)
+
+val place_settlement : board -> player -> int -> int -> bool -> bool
 (** [place_settlement board player place player_id initial] places a settlement
     for the player at the given place. If initial is true, it also distributes
     initial resources. *)

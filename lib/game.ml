@@ -7,39 +7,70 @@ let players () =
 let () = Random.self_init ()
 let roll_x x = 1 + Random.int x
 
-let initialize_game () =
-  List.iteri (fun i player ->
-      print_endline ("Player " ^ string_of_int (i + 1));
-      print_endline "Choose where to place settlement:")
-
-let initialize_game (board : Board.board) players =
-  let rec place_settlement player i reverse =
-    let player_num = if reverse then 4 - i else i + 1 in
-    print_endline
-      ("Player " ^ string_of_int player_num
-     ^ ", choose a settlement location (0-53):");
+let initialize_game board players =
+  let rec get_valid_vertex () =
     try
       let place = read_int () in
-      if place < 0 || place > 53 then (
+      (* Check if the vertex is within valid range (0-53 based on your board) *)
+      if place < 0 || place > 53 then begin
         print_endline
-          "Invalid location. Please choose a number between 0 and 53.";
-        place_settlement player i reverse)
-      else (
-        Board.place_settlement board player place
-          (if reverse then 3 - i else i)
-          reverse;
-        print_endline ("Settlement placed at " ^ string_of_int place ^ ".");
-        Board.print board;
+          "Invalid vertex number. Please choose a number between 0 and 53:";
+        get_valid_vertex ()
+      end
+      else place
+    with
+    | Failure _ ->
+        print_endline "Please enter a valid number:";
+        get_valid_vertex ()
+    | _ ->
+        print_endline "Invalid input. Please enter a number:";
+        get_valid_vertex ()
+  in
+
+  let rec place_village_with_retry board player player_idx distribute_resources
+      =
+    print_endline
+      ("Player "
+      ^ string_of_int (player_idx + 1)
+      ^ ", choose where to place your village:");
+
+    let place = get_valid_vertex () in
+
+    let success =
+      Board.place_settlement board player place player_idx distribute_resources
+    in
+    if success then begin
+      print_endline ("Village placed at " ^ string_of_int place ^ ".");
+      Board.print board;
+      if distribute_resources then
         print_endline
           ("Resources from adjacent tiles distributed to Player "
-         ^ string_of_int player_num ^ "."))
-    with Failure _ ->
-      print_endline "Invalid input. Please enter a valid integer.";
-      place_settlement player i reverse
+          ^ string_of_int (player_idx + 1)
+          ^ ".")
+    end
+    else begin
+      print_endline
+        "Cannot place settlement there! Settlements must be at least 2 roads \
+         apart.";
+      print_endline "Please try again.";
+      place_village_with_retry board player player_idx distribute_resources
+    end
   in
-  List.iteri (fun i player -> place_settlement player i false) players;
-  List.iteri (fun i player -> place_settlement player i true) (List.rev players);
-  print_endline "All players have placed their initial settlements."
+
+  (* First round - all players place their first settlement *)
+  List.iteri
+    (fun i player -> place_village_with_retry board player i false)
+    players;
+
+  (* Second round - all players place their second settlement in reverse
+     order *)
+  List.iteri
+    (fun i player ->
+      let player_idx = 3 - i in
+      place_village_with_retry board player player_idx true)
+    (List.rev players);
+
+  print_endline "All players have placed their initial villages."
 
 let roll_dice (board : Board.board) =
   let res = roll_x 6 + roll_x 6 in

@@ -2,10 +2,11 @@
 
 open Final_project
 
-(** [main] starts the game loop. *)
-
 (** Game interface for Settlers of Catan. *)
 
+(** [print_introduction ()] prints the game introduction and rules to the
+    console. This includes a welcome message, game description, and board
+    information. *)
 let print_introduction () =
   print_endline "\n=== SETTLERS OF CATAN ===";
   print_endline "Welcome to the Settlers of Catan!";
@@ -25,11 +26,14 @@ let print_introduction () =
     "- When a number is rolled, all tiles with that number produce resources";
   print_endline ""
 
+(** [get_user_input ()] waits for the user to press Enter to continue. This is
+    used as a pause mechanism in the game flow. *)
 let get_user_input () =
   print_endline "Press Enter to play...";
   let _ = read_line () in
   ()
 
+(** [main_menu ()] displays the main menu and gets the user's choice. *)
 let main_menu () =
   print_endline "\n=== MAIN MENU ===";
   print_endline "1. Play";
@@ -47,11 +51,15 @@ let main_menu () =
   in
   get_choice ()
 
-(** [display_player_resources player] prints the resources for the player. *)
+(** [display_player_resources player] prints the resources for the given player.
+*)
 let display_player_resources player =
   print_endline "\nYour resources:";
   Player.print_hand player
 
+(** [build_road_action player] handles the road building action for a player.
+    Checks if the player has enough resources, deducts them if successful, and
+    provides feedback. *)
 let build_road_action player =
   if
     Player.amt_resource "brick" player < 1
@@ -76,7 +84,8 @@ let build_road_action player =
   end
 
 (** [build_settlement_action board player player_idx] handles settlement
-    building action. *)
+    building action. Validates resource availability, prompts for valid
+    location, and handles placement with the 2-road distance rule. *)
 let build_settlement_action board player player_idx =
   if
     Player.amt_resource "brick" player < 1
@@ -99,16 +108,9 @@ let build_settlement_action board player player_idx =
           get_valid_place ()
       in
 
+      (* Check if the vertex is valid *)
       if place < 0 || place >= Array.length (Board.places board) then begin
         print_endline "Invalid vertex number. Please choose a valid location:";
-        get_valid_place ()
-      end
-      else if
-        fst (Board.places board).(place) = "s"
-        || fst (Board.places board).(place) = "c"
-      then begin
-        print_endline
-          "This location already has a settlement. Please choose another:";
         get_valid_place ()
       end
       else place
@@ -116,21 +118,39 @@ let build_settlement_action board player player_idx =
 
     let place = get_valid_place () in
 
+    (* Deduct resources for settlement building *)
     let _ = Player.remove_resource "brick" player 1 in
     let _ = Player.remove_resource "wood" player 1 in
     let _ = Player.remove_resource "sheep" player 1 in
     let _ = Player.remove_resource "wheat" player 1 in
 
-    Board.place_settlement board player place player_idx false;
+    (* Place the settlement - Board.place_settlement now returns a boolean *)
+    let success = Board.place_settlement board player place player_idx false in
 
-    print_endline
-      ("\nSettlement built successfully at vertex " ^ string_of_int place ^ "!");
-    Board.print board;
-    display_player_resources player;
-    true
+    if success then begin
+      print_endline
+        ("\nSettlement built successfully at vertex " ^ string_of_int place
+       ^ "!");
+      Board.print board;
+      display_player_resources player;
+      true
+    end
+    else begin
+      (* If placement failed, refund the resources *)
+      Player.increment_resource "brick" player;
+      Player.increment_resource "wood" player;
+      Player.increment_resource "sheep" player;
+      Player.increment_resource "wheat" player;
+      print_endline
+        "\n\
+         Cannot place settlement there! Settlements must be at least 2 roads \
+         apart.";
+      false
+    end
   end
 
-(** [trade_with_bank player] handles bank trading action. *)
+(** [trade_with_bank player] handles bank trading action at a 4:1 ratio.
+    Validates resource availability and handles the exchange. *)
 let trade_with_bank player =
   let resource_options = [ "sheep"; "wood"; "ore"; "brick"; "wheat" ] in
 
@@ -178,6 +198,8 @@ let trade_with_bank player =
     end
   end
 
+(** [color_of_player int] returns the string representation of the player's
+    color. *)
 let color_of_player int =
   match int with
   | 0 -> "RED"
@@ -186,7 +208,8 @@ let color_of_player int =
   | 3 -> "GREEN"
   | _ -> ""
 
-(** [player_turn board player_idx] handles the turn for a specific player. *)
+(** [player_turn board player_idx players] handles the turn for a specific
+    player. Rolls dice, distributes resources, and presents action options. *)
 let player_turn board player_idx players =
   let player = List.nth players player_idx in
 
@@ -234,6 +257,8 @@ let player_turn board player_idx players =
 
   action_phase ()
 
+(** [game_round board num_players current_round players] runs one round of the
+    game. Each player takes their turn in order.*)
 let game_round board num_players current_round players =
   print_endline ("\n\n====== ROUND " ^ string_of_int current_round ^ " ======");
 
@@ -246,7 +271,8 @@ let game_round board num_players current_round players =
 
   process_player_turns 0 players
 
-(** [play_game board] runs the main game loop with multiple rounds. *)
+(** [play_game board players] runs the main game loop with multiple rounds.
+    Handles initial settlement placement and game round management. *)
 let play_game board players =
   let num_players = List.length players in
 
@@ -271,6 +297,8 @@ let play_game board players =
 
   game_rounds 1
 
+(** [game_loop ()] runs the main game loop, handling menus and board display.
+    This is the main entry point for running the game. *)
 let rec game_loop () =
   print_introduction ();
 
@@ -297,7 +325,7 @@ let rec game_loop () =
   end
   else print_endline "\nThank you for playing Settlers of Catan!"
 
-(** Entry point of the program. *)
+(** Entry point of the program. Starts the game loop with error handling. *)
 let () =
   try game_loop () with
   | Failure msg ->

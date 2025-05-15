@@ -129,6 +129,85 @@ let get_adjacent_tiles place =
   | 53 -> [ 18 ]
   | _ -> [] (* Invalid place number *)
 
+(** [get_adjacent_vertices vertex] returns a list of vertices that are directly
+    connected to the given vertex by a single road. *)
+let get_adjacent_vertices vertex =
+  match vertex with
+  | 0 -> [ 1; 3 ]
+  | 1 -> [ 0; 4 ]
+  | 2 -> [ 3; 7 ]
+  | 3 -> [ 0; 2; 8 ]
+  | 4 -> [ 1; 5; 9 ]
+  | 5 -> [ 4; 10 ]
+  | 6 -> [ 7; 12 ]
+  | 7 -> [ 2; 6; 13 ]
+  | 8 -> [ 3; 9; 14 ]
+  | 9 -> [ 4; 8; 15 ]
+  | 10 -> [ 5; 11; 16 ]
+  | 11 -> [ 10; 17 ]
+  | 12 -> [ 6; 13 ]
+  | 13 -> [ 7; 12; 19 ]
+  | 14 -> [ 8; 15; 20 ]
+  | 15 -> [ 9; 14; 21 ]
+  | 16 -> [ 10; 17; 22 ]
+  | 17 -> [ 11; 16; 23 ]
+  | 18 -> [ 19; 24 ]
+  | 19 -> [ 13; 18; 25 ]
+  | 20 -> [ 14; 21; 26 ]
+  | 21 -> [ 15; 20; 27 ]
+  | 22 -> [ 16; 23; 28 ]
+  | 23 -> [ 17; 22; 29 ]
+  | 24 -> [ 18; 25 ]
+  | 25 -> [ 19; 24; 31 ]
+  | 26 -> [ 20; 27; 32 ]
+  | 27 -> [ 21; 26; 33 ]
+  | 28 -> [ 22; 29; 34 ]
+  | 29 -> [ 23; 28; 35 ]
+  | 30 -> [ 31; 36 ]
+  | 31 -> [ 25; 30; 37 ]
+  | 32 -> [ 26; 33; 38 ]
+  | 33 -> [ 27; 32; 39 ]
+  | 34 -> [ 28; 35; 40 ]
+  | 35 -> [ 29; 34; 41 ]
+  | 36 -> [ 30; 37 ]
+  | 37 -> [ 31; 36; 43 ]
+  | 38 -> [ 32; 39; 44 ]
+  | 39 -> [ 33; 38; 45 ]
+  | 40 -> [ 34; 41; 46 ]
+  | 41 -> [ 35; 40; 47 ]
+  | 42 -> [ 43; 48 ]
+  | 43 -> [ 37; 42; 49 ]
+  | 44 -> [ 38; 45; 50 ]
+  | 45 -> [ 39; 44; 51 ]
+  | 46 -> [ 40; 47; 52 ]
+  | 47 -> [ 41; 46; 53 ]
+  | 48 -> [ 42; 49 ]
+  | 49 -> [ 43; 48 ]
+  | 50 -> [ 44; 51 ]
+  | 51 -> [ 45; 50 ]
+  | 52 -> [ 46; 53 ]
+  | 53 -> [ 47; 52 ]
+  | _ -> []
+
+(** [is_vertex_occupied board vertex] checks if a given vertex already has a
+    settlement. *)
+let is_vertex_occupied board vertex =
+  let current_place = fst (places board).(vertex) in
+  current_place = "s" || current_place = "c"
+
+(** [has_adjacent_settlement board vertex] checks if any vertex adjacent to the
+    given vertex has a settlement or city. *)
+let has_adjacent_settlement board vertex =
+  let adjacent_vertices = get_adjacent_vertices vertex in
+  List.exists (fun v -> is_vertex_occupied board v) adjacent_vertices
+
+(** [can_place_settlement board vertex] checks if a settlement can be placed at
+    the given vertex according to game rules: 1. The vertex must be empty 2. No
+    adjacent vertex can have a settlement (2-road distance rule) *)
+let can_place_settlement board vertex =
+  (not (is_vertex_occupied board vertex))
+  && not (has_adjacent_settlement board vertex)
+
 let add_resource resource player =
   match resource with
   | Sheep -> Player.increment_resource "sheep" player
@@ -153,16 +232,23 @@ let color_of_player int =
   | 3 -> ANSITerminal.green
   | _ -> ANSITerminal.default
 
+(** [place_settlement board player place i bool] places a settlement at the
+    given vertex if it's allowed by the game rules. Returns true if successful,
+    false otherwise. *)
 let place_settlement board player place i bool =
-  let adjacent_tiles = get_adjacent_tiles place in
+  if can_place_settlement board place then begin
+    let adjacent_tiles = get_adjacent_tiles place in
 
-  List.iter
-    (fun tile_index ->
-      (tiles board).(tile_index).player <-
-        player :: (tiles board).(tile_index).player)
-    adjacent_tiles;
-  (places board).(place) <- ("s", color_of_player i);
-  if bool then distribute_resources board adjacent_tiles player
+    List.iter
+      (fun tile_index ->
+        (tiles board).(tile_index).player <-
+          player :: (tiles board).(tile_index).player)
+      adjacent_tiles;
+    (places board).(place) <- ("s", color_of_player i);
+    if bool then distribute_resources board adjacent_tiles player;
+    true
+  end
+  else false
 
 let print board =
   print_endline "============================================";
