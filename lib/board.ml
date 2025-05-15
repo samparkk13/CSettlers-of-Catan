@@ -27,10 +27,8 @@ type tile = {
     the given resource type when num is rolled on the dice. The player list
     contains all players who have settlements/cities adjacent to this tile.
     
-    RI: - num must be in range [2,12] excluding 7, or 0 for Desert tiles
-        - If resource = Desert, then num = 0
-        - If resource <> Desert, then num <> 0 and num <> 7
-        - player list may be empty but must not contain duplicates *)
+    RI: - num must be in range [2,12]
+      - player list may be empty but must not contain duplicates *)
 
 let tiles (x, _, _) = x
 let places (_, x, _) = x
@@ -50,8 +48,8 @@ type board = tile array * (string * style) array * style array
     - roads has exactly 72 elements (edges of the hex grid)
     - Exactly one tile has resource = Desert
     - Tiles contain exactly: 4 Wood, 4 Wheat, 4 Sheep, 3 Brick, 3 Ore, 1 Desert
-    - Number distribution: one 2, two 3s, two 4s, two 5s, two 6s, zero 7s, two
-      8s, two 9s, two 10s, two 11s, one 12
+    - Number distribution: one 2, two 3s, two 4s, two 5s, two 6s, one 7, two 8s,
+      two 9s, two 10s, two 11s, one 12
     - All places initially contain ("o", default_style)
     - Places can only contain ("o", _), ("s", player_color), or ("c",
       player_color)
