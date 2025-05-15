@@ -71,13 +71,15 @@ let build_road_action player =
   end
   else begin
     print_endline "\nSelect a location to build a road (enter any number):";
-    let _ = read_line () in
+    let i = read_line () in
 
     (* Deduct resources for road building - using let _ to ignore the boolean
        return value *)
     let _ = Player.remove_resource "brick" player 1 in
     let _ = Player.remove_resource "wood" player 1 in
 
+    (* Build the road *)
+    let _ = Board.place_road player (int_of_string i) in
     print_endline "\nRoad built successfully!";
     display_player_resources player;
     true
