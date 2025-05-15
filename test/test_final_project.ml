@@ -175,7 +175,7 @@ let print_tile_tests =
 (* Test suite *)
 let place_settlement_tests = [
   "place_settlement updates places and tiles" >:: (fun _ ->
-    let players = Game.players in
+    let players = Game.players () in
     let board = Board.create () in
     Board.place_settlement board (List.hd players) 3 0 false;
     (* Check places updated *)
@@ -189,7 +189,7 @@ let place_settlement_tests = [
   );
 
   "place_settlement distributes resources if flag true" >:: (fun _ ->
-    let players = Game.players in
+    let players = Game.players () in
     let board = Board.create () in
     Board.place_settlement board (List.hd (List.tl players)) 49 1 true;
     (* Tiles adjacent to place 49 are 16 (Sheep) and 18 (Wheat) *)
