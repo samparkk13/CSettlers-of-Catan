@@ -117,9 +117,9 @@ let create () =
     | None -> failwith "Desert not found"
   in
 
-  let board = Array.make 19 { resource = Desert; num = 0; player = [] } in
+  let board = Array.make 19 { resource = Desert; num = 7; player = [] } in
 
-  board.(desert_index) <- { resource = Desert; num = 0; player = [] };
+  board.(desert_index) <- { resource = Desert; num = 7; player = [] };
 
   let num_idx = ref 0 in
   for i = 0 to 18 do
@@ -189,7 +189,7 @@ let get_adjacent_tiles place =
   | 51 -> [ 17 ]
   | 52 -> [ 18 ]
   | 53 -> [ 18 ]
-  | _ -> [] (* Invalid place number *)
+  | _ -> []
 
 (** [get_adjacent_vertices vertex] returns a list of vertices that are directly
     connected to the given vertex by a single road. *)

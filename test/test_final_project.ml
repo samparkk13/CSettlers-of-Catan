@@ -171,14 +171,14 @@ let board_tests =
                0 (Board.tiles board)
            in
            assert_equal 1 desert_count ~printer:string_of_int );
-         ( "desert tile has number 0" >:: fun _ ->
+         ( "desert tile has number 7" >:: fun _ ->
            let board = Board.create () in
            let desert_tile =
              array_find
                (fun tile -> tile.Board.resource = Board.Desert)
                (Board.tiles board)
            in
-           assert_equal 0 desert_tile.Board.num ~printer:string_of_int );
+           assert_equal 7 desert_tile.Board.num ~printer:string_of_int );
          ( "correct resource distribution" >:: fun _ ->
            let board = Board.create () in
            let count_resource r =
@@ -210,7 +210,7 @@ let board_tests =
            assert_equal 2 number_counts.(4) ~printer:string_of_int;
            assert_equal 2 number_counts.(5) ~printer:string_of_int;
            assert_equal 2 number_counts.(6) ~printer:string_of_int;
-           assert_equal 0 number_counts.(7) ~printer:string_of_int;
+           assert_equal 1 number_counts.(7) ~printer:string_of_int;
            assert_equal 2 number_counts.(8) ~printer:string_of_int;
            assert_equal 2 number_counts.(9) ~printer:string_of_int;
            assert_equal 2 number_counts.(10) ~printer:string_of_int;
@@ -224,7 +224,7 @@ let board_tests =
            assert_equal " Wood 10" (Board.print_tile tile2);
 
            let tile3 =
-             { Board.resource = Board.Desert; num = 0; player = [] }
+             { Board.resource = Board.Desert; num = 7; player = [] }
            in
            assert_equal " Desert " (Board.print_tile tile3) );
          ( "print_tile handles double digit numbers" >:: fun _ ->
