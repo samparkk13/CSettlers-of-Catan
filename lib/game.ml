@@ -12,7 +12,7 @@ let initialize_game () =
       print_endline ("Player " ^ string_of_int (i + 1));
       print_endline "Choose where to place settlement:")
 
-let initialize_game board =
+let initialize_game (board : Board.board) =
   let rec place_settlement player i reverse =
     let player_num = if reverse then 4 - i else i + 1 in
     print_endline
@@ -36,7 +36,7 @@ let initialize_game board =
   List.iteri (fun i player -> place_settlement player i true) (List.rev players);
   print_endline "All players have placed their initial settlements."
 
-let roll_dice board =
+let roll_dice (board : Board.board) =
   let res = roll_x 6 + roll_x 6 in
   Printf.printf "Rolled: %d\n" res;
 
@@ -46,4 +46,4 @@ let roll_dice board =
         List.iter
           (fun player -> Board.add_resource tile.Board.resource player)
           tile.Board.player)
-    board
+    (Board.tiles board)

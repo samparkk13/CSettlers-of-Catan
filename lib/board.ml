@@ -17,7 +17,11 @@ type tile = {
   mutable player : player list;
 }
 
-type board = tile array
+let tiles (x, _, _) = x
+let places (_, x, _) = x
+let roads (_, _, x) = x
+
+type board = tile array * (string * style) array * style array
 
 let print_tile x =
   let num_str = string_of_int x.num in
@@ -62,8 +66,10 @@ let create () =
   in
 
   (* Create the board with resource/number thruple *)
-  Array.init 19 (fun i ->
-      { resource = resources.(i); num = numbers.(i); player = [] })
+  ( Array.init 19 (fun i ->
+        { resource = resources.(i); num = numbers.(i); player = [] }),
+    Array.make 54 ("A", ANSITerminal.default),
+    Array.make 72 ANSITerminal.default )
 
 let get_adjacent_tiles place =
   match place with
@@ -123,8 +129,6 @@ let get_adjacent_tiles place =
   | 53 -> [ 18 ]
   | _ -> [] (* Invalid place number *)
 
-let places = Array.make 54 ("A", ANSITerminal.default)
-
 let add_resource resource player =
   match resource with
   | Sheep -> Player.increment_resource "sheep" player
@@ -137,7 +141,7 @@ let add_resource resource player =
 let distribute_resources board tile_indices player =
   List.iter
     (fun tile_index ->
-      let tile = board.(tile_index) in
+      let tile = (tiles board).(tile_index) in
       add_resource tile.resource player)
     tile_indices
 
@@ -154,429 +158,590 @@ let place_settlement board player place i bool =
 
   List.iter
     (fun tile_index ->
-      board.(tile_index).player <- player :: board.(tile_index).player)
+      (tiles board).(tile_index).player <-
+        player :: (tiles board).(tile_index).player)
     adjacent_tiles;
-  places.(place) <- ("s", color_of_player i);
+  (places board).(place) <- ("s", color_of_player i);
   if bool then distribute_resources board adjacent_tiles player
-
-let roads = Array.make 72 ANSITerminal.default
 
 let print board =
   print_endline "============================================";
   print_endline "Here is your generated Catan board:";
   print_endline
     ("\n                         "
-    ^ ANSITerminal.sprintf [ snd places.(0) ] "%s" (fst places.(0))
-    ^ ANSITerminal.sprintf [ roads.(0) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(1) ] "%s" (fst places.(1))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(0) ]
+        "%s"
+        (fst (places board).(0))
+    ^ ANSITerminal.sprintf [ (roads board).(0) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(1) ]
+        "%s"
+        (fst (places board).(1))
     ^ "\n                        "
-    ^ ANSITerminal.sprintf [ roads.(1) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(1) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(2) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(2) ] "\\"
     ^ "\n                       "
-    ^ ANSITerminal.sprintf [ roads.(1) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(1) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(2) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(2) ] "\\"
     ^ "\n              "
-    ^ ANSITerminal.sprintf [ snd places.(2) ] "%s" (fst places.(2))
-    ^ ANSITerminal.sprintf [ roads.(3) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(3) ] "%s" (fst places.(3))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(2) ]
+        "%s"
+        (fst (places board).(2))
+    ^ ANSITerminal.sprintf [ (roads board).(3) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(3) ]
+        "%s"
+        (fst (places board).(3))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(1) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(1) ] "/"
     ^ " "
-    ^ print_tile board.(0)
+    ^ print_tile (tiles board).(0)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(2) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(2) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(4) ] "%s" (fst places.(4))
-    ^ ANSITerminal.sprintf [ roads.(4) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(5) ] "%s" (fst places.(5))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(4) ]
+        "%s"
+        (fst (places board).(4))
+    ^ ANSITerminal.sprintf [ (roads board).(4) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(5) ]
+        "%s"
+        (fst (places board).(5))
     ^ "\n              "
-    ^ ANSITerminal.sprintf [ roads.(5) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(5) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(6) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(6) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(7) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(7) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(8) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(8) ] "\\"
     ^ "\n             "
-    ^ ANSITerminal.sprintf [ roads.(5) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(5) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(6) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(6) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(7) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(7) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(8) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(8) ] "\\"
     ^ "\n    "
-    ^ ANSITerminal.sprintf [ snd places.(6) ] "%s" (fst places.(6))
-    ^ ANSITerminal.sprintf [ roads.(9) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(7) ] "%s" (fst places.(7))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(6) ]
+        "%s"
+        (fst (places board).(6))
+    ^ ANSITerminal.sprintf [ (roads board).(9) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(7) ]
+        "%s"
+        (fst (places board).(7))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(5) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(5) ] "/"
     ^ " "
-    ^ print_tile board.(1)
+    ^ print_tile (tiles board).(1)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(6) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(6) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(8) ] "%s" (fst places.(8))
-    ^ ANSITerminal.sprintf [ roads.(10) ] "_____"
-    ^ ANSITerminal.sprintf [ snd places.(9) ] "%s" (fst places.(9))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(8) ]
+        "%s"
+        (fst (places board).(8))
+    ^ ANSITerminal.sprintf [ (roads board).(10) ] "_____"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(9) ]
+        "%s"
+        (fst (places board).(9))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(7) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(7) ] "/"
     ^ " "
-    ^ print_tile board.(2)
+    ^ print_tile (tiles board).(2)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(8) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(8) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(10) ] "%s" (fst places.(10))
-    ^ ANSITerminal.sprintf [ roads.(11) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(11) ] "%s" (fst places.(11))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(10) ]
+        "%s"
+        (fst (places board).(10))
+    ^ ANSITerminal.sprintf [ (roads board).(11) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(11) ]
+        "%s"
+        (fst (places board).(11))
     ^ "\n    "
-    ^ ANSITerminal.sprintf [ roads.(12) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(12) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(13) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(13) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(14) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(14) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(15) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(15) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(16) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(16) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(17) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(17) ] "\\"
     ^ "\n   "
-    ^ ANSITerminal.sprintf [ roads.(12) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(12) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(13) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(13) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(14) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(14) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(15) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(15) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(16) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(16) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(17) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(17) ] "\\"
     ^ "\n "
-    ^ ANSITerminal.sprintf [ snd places.(12) ] "%s" (fst places.(12))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(12) ]
+        "%s"
+        (fst (places board).(12))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(12) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(12) ] "/"
     ^ " "
-    ^ print_tile board.(3)
+    ^ print_tile (tiles board).(3)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(13) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(13) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(13) ] "%s" (fst places.(13))
-    ^ ANSITerminal.sprintf [ roads.(18) ] "_____"
-    ^ ANSITerminal.sprintf [ snd places.(14) ] "%s" (fst places.(14))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(13) ]
+        "%s"
+        (fst (places board).(13))
+    ^ ANSITerminal.sprintf [ (roads board).(18) ] "_____"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(14) ]
+        "%s"
+        (fst (places board).(14))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(14) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(14) ] "/"
     ^ " "
-    ^ print_tile board.(4)
+    ^ print_tile (tiles board).(4)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(15) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(15) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(15) ] "%s" (fst places.(15))
-    ^ ANSITerminal.sprintf [ roads.(19) ] "_____"
-    ^ ANSITerminal.sprintf [ snd places.(16) ] "%s" (fst places.(16))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(15) ]
+        "%s"
+        (fst (places board).(15))
+    ^ ANSITerminal.sprintf [ (roads board).(19) ] "_____"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(16) ]
+        "%s"
+        (fst (places board).(16))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(16) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(16) ] "/"
     ^ " "
-    ^ print_tile board.(5)
+    ^ print_tile (tiles board).(5)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(17) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(17) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(17) ] "%s" (fst places.(17))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(17) ]
+        "%s"
+        (fst (places board).(17))
     ^ "\n  "
-    ^ ANSITerminal.sprintf [ roads.(20) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(20) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(21) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(21) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(22) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(22) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(23) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(23) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(24) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(24) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(25) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(25) ] "/"
     ^ "\n   "
-    ^ ANSITerminal.sprintf [ roads.(20) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(20) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(21) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(21) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(22) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(22) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(23) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(23) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(24) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(24) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(25) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(25) ] "/"
     ^ "\n    "
-    ^ ANSITerminal.sprintf [ snd places.(18) ] "%s" (fst places.(18))
-    ^ ANSITerminal.sprintf [ roads.(26) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(19) ] "%s" (fst places.(19))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(18) ]
+        "%s"
+        (fst (places board).(18))
+    ^ ANSITerminal.sprintf [ (roads board).(26) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(19) ]
+        "%s"
+        (fst (places board).(19))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(21) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(21) ] "/"
     ^ " "
-    ^ print_tile board.(6)
+    ^ print_tile (tiles board).(6)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(22) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(22) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(20) ] "%s" (fst places.(20))
-    ^ ANSITerminal.sprintf [ roads.(27) ] "_____"
-    ^ ANSITerminal.sprintf [ snd places.(21) ] "%s" (fst places.(21))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(20) ]
+        "%s"
+        (fst (places board).(20))
+    ^ ANSITerminal.sprintf [ (roads board).(27) ] "_____"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(21) ]
+        "%s"
+        (fst (places board).(21))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(23) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(23) ] "/"
     ^ " "
-    ^ print_tile board.(7)
+    ^ print_tile (tiles board).(7)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(24) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(24) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(22) ] "%s" (fst places.(22))
-    ^ ANSITerminal.sprintf [ roads.(28) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(23) ] "%s" (fst places.(23))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(22) ]
+        "%s"
+        (fst (places board).(22))
+    ^ ANSITerminal.sprintf [ (roads board).(28) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(23) ]
+        "%s"
+        (fst (places board).(23))
     ^ "\n    "
-    ^ ANSITerminal.sprintf [ roads.(29) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(29) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(30) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(30) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(31) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(31) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(32) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(32) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(33) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(33) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(34) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(34) ] "\\"
     ^ "\n   "
-    ^ ANSITerminal.sprintf [ roads.(29) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(29) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(30) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(30) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(31) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(31) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(32) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(32) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(33) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(33) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(34) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(34) ] "\\"
     ^ "\n "
-    ^ ANSITerminal.sprintf [ snd places.(24) ] "%s" (fst places.(24))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(24) ]
+        "%s"
+        (fst (places board).(24))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(29) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(29) ] "/"
     ^ " "
-    ^ print_tile board.(8)
+    ^ print_tile (tiles board).(8)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(30) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(30) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(25) ] "%s" (fst places.(25))
-    ^ ANSITerminal.sprintf [ roads.(35) ] "_____"
-    ^ ANSITerminal.sprintf [ snd places.(26) ] "%s" (fst places.(26))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(25) ]
+        "%s"
+        (fst (places board).(25))
+    ^ ANSITerminal.sprintf [ (roads board).(35) ] "_____"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(26) ]
+        "%s"
+        (fst (places board).(26))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(31) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(31) ] "/"
     ^ " "
-    ^ print_tile board.(9)
+    ^ print_tile (tiles board).(9)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(32) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(32) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(27) ] "%s" (fst places.(27))
-    ^ ANSITerminal.sprintf [ roads.(36) ] "_____"
-    ^ ANSITerminal.sprintf [ snd places.(28) ] "%s" (fst places.(28))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(27) ]
+        "%s"
+        (fst (places board).(27))
+    ^ ANSITerminal.sprintf [ (roads board).(36) ] "_____"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(28) ]
+        "%s"
+        (fst (places board).(28))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(33) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(33) ] "/"
     ^ " "
-    ^ print_tile board.(10)
+    ^ print_tile (tiles board).(10)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(34) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(34) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(29) ] "%s" (fst places.(29))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(29) ]
+        "%s"
+        (fst (places board).(29))
     ^ "\n  "
-    ^ ANSITerminal.sprintf [ roads.(37) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(37) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(38) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(38) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(39) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(39) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(40) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(40) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(41) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(41) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(42) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(42) ] "/"
     ^ "\n   "
-    ^ ANSITerminal.sprintf [ roads.(37) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(37) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(38) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(38) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(39) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(39) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(40) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(40) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(41) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(41) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(42) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(42) ] "/"
     ^ "\n    "
-    ^ ANSITerminal.sprintf [ snd places.(30) ] "%s" (fst places.(30))
-    ^ ANSITerminal.sprintf [ roads.(43) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(31) ] "%s" (fst places.(31))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(30) ]
+        "%s"
+        (fst (places board).(30))
+    ^ ANSITerminal.sprintf [ (roads board).(43) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(31) ]
+        "%s"
+        (fst (places board).(31))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(38) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(38) ] "/"
     ^ " "
-    ^ print_tile board.(11)
+    ^ print_tile (tiles board).(11)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(39) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(39) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(32) ] "%s" (fst places.(32))
-    ^ ANSITerminal.sprintf [ roads.(44) ] "_____"
-    ^ ANSITerminal.sprintf [ snd places.(33) ] "%s" (fst places.(33))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(32) ]
+        "%s"
+        (fst (places board).(32))
+    ^ ANSITerminal.sprintf [ (roads board).(44) ] "_____"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(33) ]
+        "%s"
+        (fst (places board).(33))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(40) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(40) ] "/"
     ^ " "
-    ^ print_tile board.(12)
+    ^ print_tile (tiles board).(12)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(41) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(41) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(34) ] "%s" (fst places.(34))
-    ^ ANSITerminal.sprintf [ roads.(45) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(35) ] "%s" (fst places.(35))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(34) ]
+        "%s"
+        (fst (places board).(34))
+    ^ ANSITerminal.sprintf [ (roads board).(45) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(35) ]
+        "%s"
+        (fst (places board).(35))
     ^ "\n    "
-    ^ ANSITerminal.sprintf [ roads.(46) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(46) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(47) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(47) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(48) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(48) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(49) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(49) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(50) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(50) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(51) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(51) ] "\\"
     ^ "\n   "
-    ^ ANSITerminal.sprintf [ roads.(46) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(46) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(47) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(47) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(48) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(48) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(49) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(49) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(50) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(50) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(51) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(51) ] "\\"
     ^ "\n "
-    ^ ANSITerminal.sprintf [ snd places.(36) ] "%s" (fst places.(36))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(36) ]
+        "%s"
+        (fst (places board).(36))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(46) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(46) ] "/"
     ^ " "
-    ^ print_tile board.(13)
+    ^ print_tile (tiles board).(13)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(47) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(47) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(37) ] "%s" (fst places.(37))
-    ^ ANSITerminal.sprintf [ roads.(52) ] "_____"
-    ^ ANSITerminal.sprintf [ snd places.(38) ] "%s" (fst places.(38))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(37) ]
+        "%s"
+        (fst (places board).(37))
+    ^ ANSITerminal.sprintf [ (roads board).(52) ] "_____"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(38) ]
+        "%s"
+        (fst (places board).(38))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(48) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(48) ] "/"
     ^ " "
-    ^ print_tile board.(14)
+    ^ print_tile (tiles board).(14)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(49) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(49) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(39) ] "%s" (fst places.(39))
-    ^ ANSITerminal.sprintf [ roads.(53) ] "_____"
-    ^ ANSITerminal.sprintf [ snd places.(40) ] "%s" (fst places.(40))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(39) ]
+        "%s"
+        (fst (places board).(39))
+    ^ ANSITerminal.sprintf [ (roads board).(53) ] "_____"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(40) ]
+        "%s"
+        (fst (places board).(40))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(50) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(50) ] "/"
     ^ " "
-    ^ print_tile board.(15)
+    ^ print_tile (tiles board).(15)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(51) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(51) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(41) ] "%s" (fst places.(41))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(41) ]
+        "%s"
+        (fst (places board).(41))
     ^ "\n  "
-    ^ ANSITerminal.sprintf [ roads.(54) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(54) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(55) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(55) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(56) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(56) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(57) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(57) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(58) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(58) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(59) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(59) ] "/"
     ^ "\n   "
-    ^ ANSITerminal.sprintf [ roads.(54) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(54) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(55) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(55) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(56) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(56) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(57) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(57) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(58) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(58) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(59) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(59) ] "/"
     ^ "\n    "
-    ^ ANSITerminal.sprintf [ snd places.(42) ] "%s" (fst places.(42))
-    ^ ANSITerminal.sprintf [ roads.(60) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(43) ] "%s" (fst places.(43))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(42) ]
+        "%s"
+        (fst (places board).(42))
+    ^ ANSITerminal.sprintf [ (roads board).(60) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(43) ]
+        "%s"
+        (fst (places board).(43))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(55) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(55) ] "/"
     ^ " "
-    ^ print_tile board.(16)
+    ^ print_tile (tiles board).(16)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(56) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(56) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(44) ] "%s" (fst places.(44))
-    ^ ANSITerminal.sprintf [ roads.(61) ] "_____"
-    ^ ANSITerminal.sprintf [ snd places.(45) ] "%s" (fst places.(45))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(44) ]
+        "%s"
+        (fst (places board).(44))
+    ^ ANSITerminal.sprintf [ (roads board).(61) ] "_____"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(45) ]
+        "%s"
+        (fst (places board).(45))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(57) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(57) ] "/"
     ^ " "
-    ^ print_tile board.(17)
+    ^ print_tile (tiles board).(17)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(58) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(58) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(46) ] "%s" (fst places.(46))
-    ^ ANSITerminal.sprintf [ roads.(62) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(47) ] "%s" (fst places.(47))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(46) ]
+        "%s"
+        (fst (places board).(46))
+    ^ ANSITerminal.sprintf [ (roads board).(62) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(47) ]
+        "%s"
+        (fst (places board).(47))
     ^ "\n            "
-    ^ ANSITerminal.sprintf [ roads.(63) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(63) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(64) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(64) ] "/"
     ^ "       "
-    ^ ANSITerminal.sprintf [ roads.(65) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(65) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(66) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(66) ] "/"
     ^ "\n             "
-    ^ ANSITerminal.sprintf [ roads.(63) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(63) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(64) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(64) ] "/"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(65) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(65) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(66) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(66) ] "/"
     ^ "\n              "
-    ^ ANSITerminal.sprintf [ snd places.(48) ] "%s" (fst places.(48))
-    ^ ANSITerminal.sprintf [ roads.(67) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(49) ] "%s" (fst places.(49))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(48) ]
+        "%s"
+        (fst (places board).(48))
+    ^ ANSITerminal.sprintf [ (roads board).(67) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(49) ]
+        "%s"
+        (fst (places board).(49))
     ^ ""
-    ^ ANSITerminal.sprintf [ roads.(64) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(64) ] "/"
     ^ " "
-    ^ print_tile board.(18)
+    ^ print_tile (tiles board).(18)
     ^ "  "
-    ^ ANSITerminal.sprintf [ roads.(65) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(65) ] "\\"
     ^ ""
-    ^ ANSITerminal.sprintf [ snd places.(50) ] "%s" (fst places.(50))
-    ^ ANSITerminal.sprintf [ roads.(68) ] "______"
-    ^ ANSITerminal.sprintf [ snd places.(51) ] "%s" (fst places.(51))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(50) ]
+        "%s"
+        (fst (places board).(50))
+    ^ ANSITerminal.sprintf [ (roads board).(68) ] "______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(51) ]
+        "%s"
+        (fst (places board).(51))
     ^ "\n                      "
-    ^ ANSITerminal.sprintf [ roads.(69) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(69) ] "\\"
     ^ "           "
-    ^ ANSITerminal.sprintf [ roads.(70) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(70) ] "/"
     ^ "\n                       "
-    ^ ANSITerminal.sprintf [ roads.(69) ] "\\"
+    ^ ANSITerminal.sprintf [ (roads board).(69) ] "\\"
     ^ "         "
-    ^ ANSITerminal.sprintf [ roads.(70) ] "/"
+    ^ ANSITerminal.sprintf [ (roads board).(70) ] "/"
     ^ "\n                        "
-    ^ ANSITerminal.sprintf [ snd places.(52) ] "%s" (fst places.(52))
-    ^ ANSITerminal.sprintf [ roads.(71) ] "_______"
-    ^ ANSITerminal.sprintf [ snd places.(53) ] "%s" (fst places.(53))
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(52) ]
+        "%s"
+        (fst (places board).(52))
+    ^ ANSITerminal.sprintf [ (roads board).(71) ] "_______"
+    ^ ANSITerminal.sprintf
+        [ snd (places board).(53) ]
+        "%s"
+        (fst (places board).(53))
     ^ "\n\n \n")

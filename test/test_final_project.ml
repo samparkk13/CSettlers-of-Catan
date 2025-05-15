@@ -77,19 +77,19 @@ let create_tests =
   [
     ( "create creates a board with 19 tiles" >:: fun _ ->
       let board = Board.create () in
-      assert_equal 19 (Array.length board) ~printer:string_of_int );
+      assert_equal 19 (Array.length (Board.tiles board)) ~printer:string_of_int );
     ( "create has exactly one Desert tile" >:: fun _ ->
       let board = Board.create () in
       let desert_count =
         Array.fold_left
           (fun count x -> if x.resource = Board.Desert then count + 1 else count)
-          0 board
+          0 (Board.tiles board)
       in
       assert_equal 1 desert_count ~printer:string_of_int );
     ( "create places Desert at index 8 with number 0" >:: fun _ ->
       let board = Board.create () in
-      let resource = board.(8).resource in
-      let number = board.(8).num in
+      let resource = (Board.tiles board).(8).resource in
+      let number = (Board.tiles board).(8).num in
       assert_equal Board.Desert resource ~printer:string_of_resource;
       assert_equal 0 number ~printer:string_of_int );
     ( "create has the correct distribution of resources" >:: fun _ ->
@@ -97,7 +97,7 @@ let create_tests =
       let count_resource r =
         Array.fold_left
           (fun count x -> if x.resource = r then count + 1 else count)
-          0 board
+          0 (Board.tiles board)
       in
       assert_equal 4
         (count_resource Board.Sheep)
@@ -122,7 +122,7 @@ let create_tests =
       Array.iter
         (fun x ->
           if x.num > 0 && x.num < 13 then number_counts.(x.num) <- number_counts.(x.num) + 1)
-        board;
+            (Board.tiles board);
       (* Check specific numbers that should appear exactly once *)
       assert_equal 1 number_counts.(2) ~printer:string_of_int
         ~msg:"Number 2 count";
@@ -172,9 +172,35 @@ let print_tile_tests =
       let result = Board.print_tile {resource = Board.Desert; num = 7; player = []} in
       assert_equal " Desert " result ~printer:(fun s -> s) );
   ]
+(* Test suite *)
+let place_settlement_tests = [
+  "place_settlement updates places and tiles" >:: (fun _ ->
+    let players = Game.players in
+    let board = Board.create () in
+    Board.place_settlement board (List.hd players) 3 0 false;
+    (* Check places updated *)
+    assert_equal ("s", Board.color_of_player 0) (Board.places board).(3);
+    (* Check player added to adjacent tiles *)
+    assert_bool "Player present on tile 0" (List.mem (List.hd players) (Board.tiles board).(0).player);
+    assert_bool "Player present on tile 1" (List.mem (List.hd players) (Board.tiles board).(1).player);
+    (* Since distribute_flag = false, player resources should still be zero *)
+    assert_equal 0 (List.hd players).Player.sheep;
+    assert_equal 0 (List.hd players).Player.wood;
+  );
 
+  "place_settlement distributes resources if flag true" >:: (fun _ ->
+    let players = Game.players in
+    let board = Board.create () in
+    Board.place_settlement board (List.hd (List.tl players)) 49 1 true;
+    (* Tiles adjacent to place 49 are 16 (Sheep) and 18 (Wheat) *)
+    (* Player should have incremented sheep and wool *)
+    assert_equal 1 (List.hd (List.tl players)).Player.sheep;
+    assert_equal 1 (List.hd (List.tl players)).Player.wheat;
+  );
+]
+  
 (** All tests for the Board module. *)
-let board_tests = List.flatten [ create_tests; print_tile_tests; roll_and_collect_resources_tests ]
+let board_tests = List.flatten [ create_tests; print_tile_tests; roll_and_collect_resources_tests; place_settlement_tests]
 
 (** Run all tests. *)
 let tests = "test suite for Settlers of Catan" >::: board_tests
