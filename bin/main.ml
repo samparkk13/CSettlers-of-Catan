@@ -75,6 +75,61 @@ let build_road_action player =
     true
   end
 
+(** [build_settlement_action board player player_idx] handles settlement
+    building action. *)
+let build_settlement_action board player player_idx =
+  if
+    Player.amt_resource "brick" player < 1
+    || Player.amt_resource "wood" player < 1
+    || Player.amt_resource "sheep" player < 1
+    || Player.amt_resource "wheat" player < 1
+  then begin
+    print_endline "\nYou don't have enough resources to build a settlement.";
+    print_endline "A settlement requires 1 brick, 1 wood, 1 sheep, and 1 wheat.";
+    false
+  end
+  else begin
+    print_endline "\nSelect a vertex to build a settlement:";
+
+    let rec get_valid_place () =
+      let place =
+        try int_of_string (read_line ())
+        with Failure _ ->
+          print_endline "Please enter a valid number:";
+          get_valid_place ()
+      in
+
+      if place < 0 || place >= Array.length (Board.places board) then begin
+        print_endline "Invalid vertex number. Please choose a valid location:";
+        get_valid_place ()
+      end
+      else if
+        fst (Board.places board).(place) = "s"
+        || fst (Board.places board).(place) = "c"
+      then begin
+        print_endline
+          "This location already has a settlement. Please choose another:";
+        get_valid_place ()
+      end
+      else place
+    in
+
+    let place = get_valid_place () in
+
+    let _ = Player.remove_resource "brick" player 1 in
+    let _ = Player.remove_resource "wood" player 1 in
+    let _ = Player.remove_resource "sheep" player 1 in
+    let _ = Player.remove_resource "wheat" player 1 in
+
+    Board.place_settlement board player place player_idx false;
+
+    print_endline
+      ("\nSettlement built successfully at vertex " ^ string_of_int place ^ "!");
+    Board.print board;
+    display_player_resources player;
+    true
+  end
+
 (** [trade_with_bank player] handles bank trading action. *)
 let trade_with_bank player =
   let resource_options = [ "sheep"; "wood"; "ore"; "brick"; "wheat" ] in
@@ -148,27 +203,32 @@ let player_turn board player_idx players =
   let rec action_phase () =
     print_endline "\nWhat would you like to do?";
     print_endline "1. Build a road (costs 1 brick, 1 wood)";
-    print_endline "2. Trade with the bank (4:1 ratio)";
-    print_endline "3. View board";
-    print_endline "4. End turn";
-    print_endline "\nEnter your choice (1-4): ";
+    print_endline
+      "2. Build a settlement (costs 1 brick, 1 wood, 1 sheep, 1 wheat)";
+    print_endline "3. Trade with the bank (4:1 ratio)";
+    print_endline "4. View board";
+    print_endline "5. End turn";
+    print_endline "\nEnter your choice (1-5): ";
 
     match read_line () with
     | "1" ->
         let _ = build_road_action player in
         action_phase ()
     | "2" ->
-        let _ = trade_with_bank player in
+        let _ = build_settlement_action board player player_idx in
         action_phase ()
     | "3" ->
-        Board.print board;
+        let _ = trade_with_bank player in
         action_phase ()
     | "4" ->
+        Board.print board;
+        action_phase ()
+    | "5" ->
         print_endline
           ("\nPlayer " ^ string_of_int (player_idx + 1) ^ "'s turn ended.");
         ()
     | _ ->
-        print_endline "Invalid choice. Please enter a number between 1 and 4.";
+        print_endline "Invalid choice. Please enter a number between 1 and 5.";
         action_phase ()
   in
 
@@ -196,10 +256,17 @@ let play_game board players =
   let rec game_rounds round =
     game_round board num_players round players;
 
-    print_endline "\nContinue to the next round? (y/n): ";
-    match read_line () with
-    | "y" | "Y" -> game_rounds (round + 1)
-    | _ -> print_endline "\nGame ended."
+    let rec ask_continue () =
+      print_endline "\nContinue to the next round? (y/n): ";
+      match read_line () with
+      | "y" | "Y" -> game_rounds (round + 1)
+      | "n" | "N" -> print_endline "\nGame ended."
+      | _ ->
+          print_endline "Invalid input. Please enter 'y' for yes or 'n' for no.";
+          ask_continue ()
+    in
+
+    ask_continue ()
   in
 
   game_rounds 1
