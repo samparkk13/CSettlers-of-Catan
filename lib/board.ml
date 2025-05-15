@@ -8,20 +8,57 @@ type resource =
   | Brick
   | Wheat
   | Desert
+      (** [resource] represents the different types of resources in the game.
+          There is no abstraction here as this is a simple variant type. *)
 
 type player = Player.p
+(** [player] is a type alias for a player representation in the game.
+
+    AF: Same as Player.p - represents a player's state in the game.
+
+    RI: Same as Player.p. *)
 
 type tile = {
   resource : resource;
   num : int;
   mutable player : player list;
 }
+(** [tile] represents a single hexagonal tile on the board.
+    
+    AF: A tile {resource; num; player} represents a hexagonal tile producing
+    the given resource type when num is rolled on the dice. The player list
+    contains all players who have settlements/cities adjacent to this tile.
+    
+    RI: - num must be in range [2,12] excluding 7, or 0 for Desert tiles
+        - If resource = Desert, then num = 0
+        - If resource <> Desert, then num <> 0 and num <> 7
+        - player list may be empty but must not contain duplicates *)
 
 let tiles (x, _, _) = x
 let places (_, x, _) = x
 let roads (_, _, x) = x
 
 type board = tile array * (string * style) array * style array
+(** [board] represents the entire Catan game board.
+
+    AF: A board (tiles, places, roads) represents a Catan game state where:
+    - tiles.(i) is the i-th hexagonal tile on the board (0 <= i < 19)
+    - places.(j) is the j-th vertex/settlement location as a pair (symbol,
+      color) where symbol is "o" (empty), "s" (settlement), or "c" (city)
+    - roads.(k) is the k-th edge location's color/style
+
+    RI: - tiles has exactly 19 elements
+    - places has exactly 54 elements (vertices of the hex grid)
+    - roads has exactly 72 elements (edges of the hex grid)
+    - Exactly one tile has resource = Desert
+    - Tiles contain exactly: 4 Wood, 4 Wheat, 4 Sheep, 3 Brick, 3 Ore, 1 Desert
+    - Number distribution: one 2, two 3s, two 4s, two 5s, two 6s, zero 7s, two
+      8s, two 9s, two 10s, two 11s, one 12
+    - All places initially contain ("o", default_style)
+    - Places can only contain ("o", _), ("s", player_color), or ("c",
+      player_color)
+    - The adjacency relationships defined by get_adjacent_vertices are symmetric
+*)
 
 let print_tile x =
   let num_str = string_of_int x.num in

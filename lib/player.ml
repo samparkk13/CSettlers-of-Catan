@@ -5,8 +5,24 @@ type hand = {
   mutable brick : int;
   mutable wheat : int;
 }
+(** [hand] represents a player's collection of resources in Settlers of Catan.
+    
+    AF: A hand {sheep; wood; ore; brick; wheat} represents a player's resources
+    where sheep is the number of sheep cards, wood is the number of wood cards,
+    ore is the number of ore cards, brick is the number of brick cards, and
+    wheat is the number of wheat cards the player holds.
+    
+    RI: - All resource counts must be non-negative (>= 0)
+        - The implementation enforces this through increment_resource (adds 1)
+          and remove_resource (checks for sufficient resources before removing) *)
 
 type p = hand
+(** [p] represents a player in the game.
+
+    AF: A value of type p represents a player's state in the game, which
+    currently consists only of their hand of resources.
+
+    RI: Same as the RI for hand. *)
 
 let create () : p = { sheep = 0; wood = 0; ore = 0; brick = 0; wheat = 0 }
 

@@ -5,8 +5,11 @@ type hand = {
   mutable brick : int;
   mutable wheat : int;
 }
+(** [hand] represents a player's collection of resource cards in Settlers of
+    Catan. *)
 
 type p = hand
+(** [p] represents a player in the game. *)
 
 val create : unit -> p
 (** [create ()] creates a new player hand with all resources initialized to 0.

@@ -1,4 +1,9 @@
 type player = Player.p
+(** [player] is a type alias for a player representation in the game.
+
+    AF: Same as Player.p - represents a player's state in the game.
+
+    RI: Same as Player.p. *)
 
 let players () =
   [ Player.create (); Player.create (); Player.create (); Player.create () ]
