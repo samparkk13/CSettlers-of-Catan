@@ -8,8 +8,6 @@ type resource =
   | Brick
   | Wheat
   | Desert
-      (** [resource] represents the different types of resources in the game.
-          There is no abstraction here as this is a simple variant type. *)
 
 type player = Player.p
 (** [player] is a type alias for a player representation in the game.
