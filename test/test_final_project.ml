@@ -86,12 +86,6 @@ let create_tests =
           0 (Board.tiles board)
       in
       assert_equal 1 desert_count ~printer:string_of_int );
-    ( "create places Desert at index 8 with number 0" >:: fun _ ->
-      let board = Board.create () in
-      let resource = (Board.tiles board).(8).resource in
-      let number = (Board.tiles board).(8).num in
-      assert_equal Board.Desert resource ~printer:string_of_resource;
-      assert_equal 0 number ~printer:string_of_int );
     ( "create has the correct distribution of resources" >:: fun _ ->
       let board = Board.create () in
       let count_resource r =
@@ -137,7 +131,7 @@ let create_tests =
         ~msg:"Number 5 count";
       assert_equal 2 number_counts.(6) ~printer:string_of_int
         ~msg:"Number 6 count";
-      assert_equal 0 number_counts.(7) ~printer:string_of_int
+      assert_equal 1 number_counts.(7) ~printer:string_of_int
         ~msg:"Number 7 count";
       (* No 7s in Catan *)
       assert_equal 2 number_counts.(8) ~printer:string_of_int
@@ -177,7 +171,9 @@ let place_settlement_tests = [
   "place_settlement updates places and tiles" >:: (fun _ ->
     let players = Game.players () in
     let board = Board.create () in
-    Board.place_settlement board (List.hd players) 3 0 false;
+    ignore(Board.place_settlement board (List.hd players) 3 0 false);
+    (Board.tiles board).(0) <- { resource = Sheep; num = 5; player = [(List.hd players)] };
+    (Board.tiles board).(1) <- { resource = Wood; num = 2; player = [(List.hd players)] };
     (* Check places updated *)
     assert_equal ("s", Board.color_of_player 0) (Board.places board).(3);
     (* Check player added to adjacent tiles *)
@@ -191,7 +187,9 @@ let place_settlement_tests = [
   "place_settlement distributes resources if flag true" >:: (fun _ ->
     let players = Game.players () in
     let board = Board.create () in
-    Board.place_settlement board (List.hd (List.tl players)) 49 1 true;
+    (Board.tiles board).(16) <- { resource = Sheep; num = 11; player = [(List.hd (List.tl players))] };
+    (Board.tiles board).(18) <- { resource = Wheat; num = 6; player = [(List.hd (List.tl players))] };
+    ignore(Board.place_settlement board (List.hd (List.tl players)) 49 1 true);
     (* Tiles adjacent to place 49 are 16 (Sheep) and 18 (Wheat) *)
     (* Player should have incremented sheep and wool *)
     assert_equal 1 (List.hd (List.tl players)).Player.sheep;

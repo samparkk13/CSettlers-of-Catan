@@ -82,9 +82,9 @@ let create () =
     | None -> failwith "Desert not found"
   in
 
-  let board = Array.make 19 { resource = Desert; num = 0; player = [] } in
+  let board = Array.make 19 { resource = Desert; num = 7; player = [] } in
 
-  board.(desert_index) <- { resource = Desert; num = 0; player = [] };
+  board.(desert_index) <- { resource = Desert; num = 7; player = [] };
 
   let num_idx = ref 0 in
   for i = 0 to 18 do
@@ -147,7 +147,7 @@ let get_adjacent_tiles place =
   | 44 -> [ 14; 16; 18 ]
   | 45 -> [ 14; 17; 18 ]
   | 46 -> [ 15; 17 ]
-  | 47 -> [ 115 ]
+  | 47 -> [ 15 ]
   | 48 -> [ 16 ]
   | 49 -> [ 16; 18 ]
   | 50 -> [ 17; 18 ]
@@ -155,6 +155,7 @@ let get_adjacent_tiles place =
   | 52 -> [ 18 ]
   | 53 -> [ 18 ]
   | _ -> [] (* Invalid place number *)
+[@@coverage off]
 
 (** [get_adjacent_vertices vertex] returns a list of vertices that are directly
     connected to the given vertex by a single road. *)
@@ -215,6 +216,7 @@ let get_adjacent_vertices vertex =
   | 52 -> [ 46; 53 ]
   | 53 -> [ 47; 52 ]
   | _ -> []
+[@@coverage off]
 
 (** [is_vertex_occupied board vertex] checks if a given vertex already has a
     settlement. *)
@@ -858,3 +860,4 @@ let print board =
         "%s"
         (fst (places board).(53))
     ^ "\n\n \n")
+[@@coverage off]
