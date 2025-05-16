@@ -13,23 +13,24 @@ let () = Random.self_init ()
 let roll_x x = 1 + Random.int x
 
 let initialize_game board players =
-  let rec get_valid_vertex () =
+  let rec get_valid_number min max prompt =
+    print_endline prompt;
     try
-      let place = read_int () in
-      (* Check if the vertex is within valid range (0-53 based on your board) *)
-      if place < 0 || place > 53 then begin
+      let num = read_int () in
+      if num < min || num > max then begin
         print_endline
-          "Invalid vertex number. Please choose a number between 0 and 53:";
-        get_valid_vertex ()
+          ("Invalid number. Please choose a number between " ^ string_of_int min
+         ^ " and " ^ string_of_int max ^ ":");
+        get_valid_number min max prompt
       end
-      else place
+      else num
     with
     | Failure _ ->
         print_endline "Please enter a valid number:";
-        get_valid_vertex ()
+        get_valid_number min max prompt
     | _ ->
         print_endline "Invalid input. Please enter a number:";
-        get_valid_vertex ()
+        get_valid_number min max prompt
   in
 
   let rec place_village_with_retry board player player_idx distribute_resources
@@ -39,7 +40,7 @@ let initialize_game board players =
       ^ string_of_int (player_idx + 1)
       ^ ", choose where to place your village:");
 
-    let place = get_valid_vertex () in
+    let place = get_valid_number 0 53 "Enter a valid vertex number (0-53):" in
 
     let success =
       Board.place_settlement board player place player_idx distribute_resources
@@ -52,9 +53,10 @@ let initialize_game board players =
           ("Resources from adjacent tiles distributed to Player "
           ^ string_of_int (player_idx + 1)
           ^ ".");
-      print_endline "Enter where you want to place your road: (0-71)";
-      let v = read_int () in
-      Board.place_road player_idx v board players;
+      let road_place =
+        get_valid_number 0 71 "Enter where you want to place your road: (0-71)"
+      in
+      Board.place_road player_idx road_place board players;
       Board.print board
     end
     else begin
